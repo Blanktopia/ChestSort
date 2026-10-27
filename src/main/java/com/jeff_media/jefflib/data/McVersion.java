@@ -17,8 +17,9 @@
 
 package com.jeff_media.jefflib.data;
 
-import com.jeff_media.jefflib.WordUtils;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,10 +33,12 @@ public class McVersion implements Comparable<McVersion> {
     private static final McVersion v1_17 = new McVersion(1, 17);
 
     static {
-        final int currentMajor = Integer.parseInt(Bukkit.getBukkitVersion().split("\\.")[0]);
-        final int currentMinor = Integer.parseInt(Bukkit.getBukkitVersion().split("\\.")[1].split("-")[0]);
-        boolean hasPatch = WordUtils.countChar(Bukkit.getBukkitVersion(), '.') == 3;
-        final int currentPatch = hasPatch ? Integer.parseInt(Bukkit.getBukkitVersion().split("\\.")[2].split("-")[0]) : 0;
+        // Examples: 1.21.4-R0.1-SNAPSHOT, 26.3-R0.1-SNAPSHOT, 26.3.build.2654-stable
+        final Matcher version = Pattern.compile("(\\d+)\\.(\\d+)(?:\\.(\\d+))?").matcher(Bukkit.getBukkitVersion());
+        version.lookingAt();
+        final int currentMajor = Integer.parseInt(version.group(1));
+        final int currentMinor = Integer.parseInt(version.group(2));
+        final int currentPatch = version.group(3) != null ? Integer.parseInt(version.group(3)) : 0;
 
         CURRENT_VERSION = new McVersion(currentMajor, currentMinor, currentPatch);
     }
